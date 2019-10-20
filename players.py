@@ -37,7 +37,7 @@ class HumanGamePlayer(GamePlayer):
         return guess
 
     def choose_word(self) -> None:
-        get_input_with_validation('Please choose a word and keep it to yourself! Have you decided?',
+        get_input_with_validation('Please choose a word and keep it to yourself! Have you decided? Yes or No?',
                                   {'yes', 'YES', 'Yes', 'Y', 'y'})
 
     def tell_word_length(self) -> int:

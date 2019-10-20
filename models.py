@@ -51,8 +51,6 @@ class GameRound:
         """
         Secret keeper wins 10 points per not guessed character.
         Guesser wins 10 points per guessed character.
-        Besides these, if guessers win the round, each guesser gets 10 points; if secret keeper wins, it gets x points
-        where x is the highest points among guessers
         """
         secret_keeper_player_id = \
             [player_id for player_id, role in self.player_to_role.items() if role == GamePlayerRole.SECRET_KEEPER][0]
@@ -63,11 +61,5 @@ class GameRound:
             player_to_score[attempt.player_id] += 10 * guessed_length
             total_guessed_length += guessed_length
 
-        if total_guessed_length == self.secret_word_length:
-            for player_id in self.player_to_role:
-                if player_id != secret_keeper_player_id:
-                    player_to_score[player_id] += 10
-        else:
-            player_to_score[secret_keeper_player_id] += max(player_to_score.values())
-            player_to_score[secret_keeper_player_id] += 10 * (self.secret_word_length - total_guessed_length)
+        player_to_score[secret_keeper_player_id] += 10 * (self.secret_word_length - total_guessed_length)
         return player_to_score
