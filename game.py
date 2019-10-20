@@ -18,9 +18,12 @@ class Game:
         while num_rounds > 0:
             self.game_rounds.append(self.start_game_round())
             num_rounds -= 1
-        player_to_score = self.get_scores_by_player()
+
         print('Game ends. Here is the score board.')
-        print(player_to_score)
+        player_id_to_score = self.get_scores_by_player()
+        for player_id, score in player_id_to_score.items():
+            player_name = self.id_to_player[player_id].name
+            print(f'Player {player_id}, {player_name}: {score}')
 
     def start_game_round(self) -> GameRound:
         # Assign players roles randomly
@@ -28,8 +31,8 @@ class Game:
         secret_keeper_player = self.id_to_player[secret_keeper_player_id]
         guesser_players = [player for player_id, player in self.id_to_player.items() if
                            player_id != secret_keeper_player_id]
-        print(f'Player {secret_keeper_player_id}, you have been selected to be the secret keeper for this round.')
-        print(f'Players {",".join([str(guesser_player.id) for guesser_player in guesser_players])}, you are going to '
+        print(f'Player {secret_keeper_player.name}, you have been selected to be the secret keeper for this round.')
+        print(f'Player {",".join([str(guesser_player.name) for guesser_player in guesser_players])}, you are going to '
               f'guess the secret word in turns.')
         print('Let the game begin')
 
@@ -46,10 +49,10 @@ class Game:
             for guesser_player in guesser_players:
                 input('Press any key to continue')
                 refresh_screen(game_round)
-                print(f'Player {guesser_player.id}, it\'s your turn.')
+                print(f'Player {guesser_player.name}, it\'s your turn.')
 
                 guess = guesser_player.guess(game_round)
-                print(f'Player {guesser_player.id}, guessed {guess}.')
+                print(f'Player {guesser_player.name}, guessed {guess}.')
                 matched_positions = secret_keeper_player.check(game_round, guess)
                 game_round.add_attempt(GuessAttempt(guesser_player.id, guess, matched_positions))
                 refresh_screen(game_round)
@@ -69,11 +72,12 @@ class Game:
         return game_round
 
     def get_scores_by_player(self) -> Dict[int, int]:
-        player_to_score = {}
-        for player_to_score_round in [game_round.calculate_players_scores() for game_round in self.game_rounds]:
-            for player, score in player_to_score_round.items():
-                if player in player_to_score:
-                    player_to_score[player] += score
+        player_id_to_score = {}
+        player_id_to_score_per_round = [game_round.calculate_players_scores() for game_round in self.game_rounds]
+        for player_id_to_score_round in player_id_to_score_per_round:
+            for player_id, score in player_id_to_score_round.items():
+                if player_id in player_id_to_score:
+                    player_id_to_score[player_id] += score
                 else:
-                    player_to_score[player] = score
-        return player_to_score
+                    player_id_to_score[player_id] = score
+        return player_id_to_score
